@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Persistence;
 
 namespace Application.Services
 {
@@ -13,8 +14,10 @@ namespace Application.Services
 
         private CancellationTokenSource _cts;
 
+        SocketContext _socketContext;
+
         public TraderService(Func<float, string> strategy)
-        {
+        {            
             _strategy = strategy;
             Initialize();
         }
@@ -22,7 +25,8 @@ namespace Application.Services
         public void Initialize()
         {
             _traderThread = new Thread(Trade);
-
+            _socketContext = new SocketContext();
+            _socketContext.Connect();
             _cts = new CancellationTokenSource();
         }
 
@@ -30,7 +34,8 @@ namespace Application.Services
         {
             if (!_traderThread.IsAlive)
             {
-                if(_cts.IsCancellationRequested){
+                if (_cts.IsCancellationRequested)
+                {
                     Initialize();
                 }
                 _traderThread.Start(_cts.Token);
@@ -46,20 +51,41 @@ namespace Application.Services
             _cts.Cancel();
         }
 
-        public void Trade(object obj)
+        private void Trade(object obj)
         {
             CancellationToken token = (CancellationToken) obj;
             try
             {
                 while (true)
                 {
-                    Console.WriteLine("Trade");
-                    token.ThrowIfCancellationRequested(); 
+                    token.ThrowIfCancellationRequested();
+                    //var result = _strategy(DataContext.GetPrice("d"));
+                    //CheckStrategyResult(result);
                 }
             }
             catch (OperationCanceledException)
             {
                 Console.WriteLine("Trader stopped");
+            }
+        }
+
+        private void CheckStrategyResult(string result)
+        {
+            if (result == "buy")
+            {
+                Console.WriteLine("buy");
+            }
+            else if (result == "sell")
+            {
+                Console.WriteLine("sell");
+            }
+            else if (result == "hold")
+            {
+                Console.WriteLine("hold");
+            }
+            else
+            {
+                throw new OperationCanceledException();
             }
         }
     }
