@@ -1,7 +1,11 @@
 using System.Net.WebSockets;
 using Websocket.Client;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Domain;
 
-namespace Application
+namespace Application.Services
 {
     public class RealTimeDataService
     {
@@ -64,15 +68,14 @@ namespace Application
                 .ReconnectionHappened
                 .Subscribe(info =>
                     Console
-                        .WriteLine($"Reconnection happened, type: {
-                            info.Type}"));
+                        .WriteLine($"Reconnection happened, type: {info.Type}"));
 
             client
                 .MessageReceived
                 .Subscribe(msg =>
                 {
-                    Console.WriteLine($"Message received: {msg}");
-                    _currentPrice = 0;
+                    StockResponse stock = JsonConvert.DeserializeObject<StockResponse>(msg.ToString());
+                    _currentPrice = stock.data[0].p;
                 });
 
             client.Start();
@@ -80,7 +83,7 @@ namespace Application
             Task
                 .Run(() =>
                     client
-                        .Send("{\"type\":\"subscribe\",\"symbol\":\"AAPL\"}"));
+                        .Send("{\"type\":\"subscribe\",\"symbol\":\"BINANCE:BTCUSDT\"}"));
 
             exitEvent.WaitOne();
         }
@@ -95,4 +98,7 @@ namespace Application
             }
         }
     }
+
+
+
 }

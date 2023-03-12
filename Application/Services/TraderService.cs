@@ -16,7 +16,7 @@ namespace Application.Services
         RealTimeDataService _realTimeDataService;
 
         public TraderService(Func<float, string> strategy)
-        {            
+        {
             _strategy = strategy;
             Initialize();
         }
@@ -54,14 +54,20 @@ namespace Application.Services
 
         private void Trade(object obj)
         {
-            CancellationToken token = (CancellationToken) obj;
+            CancellationToken token = (CancellationToken)obj;
             try
             {
                 while (true)
                 {
                     token.ThrowIfCancellationRequested();
-                    var result = _strategy(_realTimeDataService.GetPrice());
-                    CheckStrategyResult(result);
+                    var price = _realTimeDataService.GetPrice();
+                    if (price != 0)
+                    {
+                        System.Console.WriteLine(price);
+                        var result = _strategy(price);
+                    }
+
+                    // CheckStrategyResult(result);
                 }
             }
             catch (OperationCanceledException)
