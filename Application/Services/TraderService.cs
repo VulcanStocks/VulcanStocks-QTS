@@ -37,6 +37,7 @@ namespace Application.Services
                 {
                     Initialize();
                 }
+                _socketContext.Start();
                 _traderThread.Start(_cts.Token);
             }
             else
@@ -48,6 +49,8 @@ namespace Application.Services
         public void StopTrader()
         {
             _cts.Cancel();
+            _socketContext.Stop();
+
         }
 
         private void Trade(object obj)
@@ -58,8 +61,8 @@ namespace Application.Services
                 while (true)
                 {
                     token.ThrowIfCancellationRequested();
-                    //var result = _strategy(DataContext.GetPrice("d"));
-                    //CheckStrategyResult(result);
+                    var result = _strategy(_socketContext.GetPrice());
+                    CheckStrategyResult(result);
                 }
             }
             catch (OperationCanceledException)

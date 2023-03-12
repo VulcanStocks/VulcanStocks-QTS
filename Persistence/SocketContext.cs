@@ -15,6 +15,8 @@ namespace Persistence
 
         private bool _isDisconected = false;
 
+        private float _currentPrice;
+
         public SocketContext()
         {
             Initialize();
@@ -23,6 +25,11 @@ namespace Persistence
         private void Initialize()
         {
             _socketThread = new Thread(Connect);
+        }
+
+        public float GetPrice()
+        {
+            return _currentPrice;
         }
 
         public void Start()
@@ -63,7 +70,10 @@ namespace Persistence
             client
                 .MessageReceived
                 .Subscribe(msg =>
-                    Console.WriteLine($"Message received: {msg}"));
+                {
+                    Console.WriteLine($"Message received: {msg}");
+                    _currentPrice = 0;
+                });
 
             client.Start();
 
