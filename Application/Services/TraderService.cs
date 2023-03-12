@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Persistence;
 
 namespace Application.Services
 {
@@ -14,7 +13,7 @@ namespace Application.Services
 
         private CancellationTokenSource _cts;
 
-        SocketContext _socketContext;
+        RealTimeDataService _realTimeDataService;
 
         public TraderService(Func<float, string> strategy)
         {            
@@ -25,7 +24,7 @@ namespace Application.Services
         public void Initialize()
         {
             _traderThread = new Thread(Trade);
-            _socketContext = new SocketContext();
+            _realTimeDataService = new RealTimeDataService();
             _cts = new CancellationTokenSource();
         }
 
@@ -37,7 +36,7 @@ namespace Application.Services
                 {
                     Initialize();
                 }
-                _socketContext.Start();
+                _realTimeDataService.Start();
                 _traderThread.Start(_cts.Token);
             }
             else
@@ -49,7 +48,7 @@ namespace Application.Services
         public void StopTrader()
         {
             _cts.Cancel();
-            _socketContext.Stop();
+            _realTimeDataService.Stop();
 
         }
 
@@ -61,7 +60,7 @@ namespace Application.Services
                 while (true)
                 {
                     token.ThrowIfCancellationRequested();
-                    var result = _strategy(_socketContext.GetPrice());
+                    var result = _strategy(_realTimeDataService.GetPrice());
                     CheckStrategyResult(result);
                 }
             }

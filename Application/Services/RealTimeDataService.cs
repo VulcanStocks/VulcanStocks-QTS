@@ -1,9 +1,9 @@
 using System.Net.WebSockets;
 using Websocket.Client;
 
-namespace Persistence
+namespace Application
 {
-    public class SocketContext
+    public class RealTimeDataService
     {
         private WebsocketClient
             client =
@@ -17,7 +17,7 @@ namespace Persistence
 
         private float _currentPrice;
 
-        public SocketContext()
+        public RealTimeDataService()
         {
             Initialize();
         }
