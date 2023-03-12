@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
-using System.Threading.Tasks;
 using Websocket.Client;
 
 namespace Persistence
@@ -15,7 +11,44 @@ namespace Persistence
 
         private ManualResetEvent exitEvent;
 
-        public void Connect()
+        private Thread _socketThread;
+
+        private bool _isDisconected = false;
+
+        public SocketContext()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            _socketThread = new Thread(Connect);
+        }
+
+        public void Start()
+        {
+            if (!_socketThread.IsAlive)
+            {
+                if (_isDisconected)
+                {
+                    Initialize();
+                    _isDisconected = false;
+                }
+                _socketThread.Start();
+            }
+            else
+            {
+                System.Console.WriteLine("Trader is already running");
+            }
+        }
+
+        public void Stop()
+        {
+            Disconnect();
+            _isDisconected = true;
+        }
+
+        private void Connect()
         {
             exitEvent = new ManualResetEvent(false);
 
@@ -31,6 +64,7 @@ namespace Persistence
                 .MessageReceived
                 .Subscribe(msg =>
                     Console.WriteLine($"Message received: {msg}"));
+
             client.Start();
 
             Task
@@ -41,11 +75,13 @@ namespace Persistence
             exitEvent.WaitOne();
         }
 
-        public void Disconnect()
+        private void Disconnect()
         {
             if (client != null && client.IsRunning)
             {
                 client.Stop(WebSocketCloseStatus.NormalClosure, "");
+                exitEvent.Set();
+                System.Console.WriteLine("client disconnect");
             }
         }
     }

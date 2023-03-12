@@ -26,7 +26,6 @@ namespace Application.Services
         {
             _traderThread = new Thread(Trade);
             _socketContext = new SocketContext();
-            _socketContext.Connect();
             _cts = new CancellationTokenSource();
         }
 
