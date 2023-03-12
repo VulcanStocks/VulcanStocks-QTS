@@ -30,7 +30,9 @@ namespace Application.Services
         {
             if (!_traderThread.IsAlive)
             {
-                Initialize();
+                if(_cts.IsCancellationRequested){
+                    Initialize();
+                }
                 _traderThread.Start(_cts.Token);
             }
             else
