@@ -1,5 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Application.Services;
+using Persistence;
+using Websocket.Client;
+
 
 
 var trader = new TraderService(strategy);
