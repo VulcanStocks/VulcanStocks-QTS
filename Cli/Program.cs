@@ -1,11 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Application.Indicators;
 using Application.Services;
 
+var ema = new Ema(2);
 
 var trader = new TradeEngineService(strategy);
-
 string strategy(float price, float volume){
-    IndicatorService.TryCalculateRsi(price);
+    ema.TryGetValue(price,volume);
     return "hold";
 }
 
