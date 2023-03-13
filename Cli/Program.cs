@@ -2,9 +2,6 @@
 using Application.Services;
 
 
-var client = new RealTimeDataService();
-
-
 var trader = new TradeEngineService(strategy);
 
 string strategy(float price, float volume){
