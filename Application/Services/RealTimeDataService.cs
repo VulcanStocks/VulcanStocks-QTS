@@ -20,6 +20,8 @@ namespace Application.Services
         private bool _isDisconected = false;
 
         private float _currentPrice;
+        private float _currentVolume;
+
 
         public RealTimeDataService()
         {
@@ -34,6 +36,11 @@ namespace Application.Services
         public float GetPrice()
         {
             return _currentPrice;
+        }
+
+        public float GetVolume()
+        {
+            return _currentVolume;
         }
 
         public void Start()
@@ -76,6 +83,7 @@ namespace Application.Services
                 {
                     StockResponse stock = JsonConvert.DeserializeObject<StockResponse>(msg.ToString());
                     _currentPrice = stock.data[0].p;
+                    _currentVolume = stock.data[0].v;
                 });
 
             client.Start();
@@ -94,7 +102,7 @@ namespace Application.Services
             {
                 client.Stop(WebSocketCloseStatus.NormalClosure, "");
                 exitEvent.Set();
-                System.Console.WriteLine("client disconnect");
+                System.Console.WriteLine("Client disconnect");
             }
         }
     }

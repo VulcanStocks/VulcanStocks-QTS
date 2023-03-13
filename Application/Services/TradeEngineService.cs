@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class TraderService
+    public class TradeEngineService
     {
         private Thread _traderThread;
 
-        private Func<float, string> _strategy;
+        private Func<float, float, string> _strategy;
 
         private CancellationTokenSource _cts;
 
         RealTimeDataService _realTimeDataService;
 
-        public TraderService(Func<float, string> strategy)
+        public TradeEngineService(Func<float, float, string> strategy)
         {
             _strategy = strategy;
             Initialize();
@@ -23,7 +23,7 @@ namespace Application.Services
 
         public void Initialize()
         {
-            _traderThread = new Thread(Trade);
+            _traderThread = new Thread(EnterTradeLoop);
             _realTimeDataService = new RealTimeDataService();
             _cts = new CancellationTokenSource();
         }
@@ -52,7 +52,7 @@ namespace Application.Services
 
         }
 
-        private void Trade(object obj)
+        private void EnterTradeLoop(object obj)
         {
             CancellationToken token = (CancellationToken)obj;
             try
@@ -60,20 +60,34 @@ namespace Application.Services
                 while (true)
                 {
                     token.ThrowIfCancellationRequested();
-                    var price = _realTimeDataService.GetPrice();
-                    if (price != 0)
-                    {
-                        System.Console.WriteLine(price);
-                        var result = _strategy(price);
-                    }
-
-                    // CheckStrategyResult(result);
+                    Trade();
                 }
             }
             catch (OperationCanceledException)
             {
                 Console.WriteLine("Trader stopped");
             }
+        }
+
+        private void Trade()
+        {
+            var price = _realTimeDataService.GetPrice();
+            var volume = _realTimeDataService.GetVolume();
+            //price is zero if _realTimeDataService not working
+            if (price != 0)
+            {
+                var result = _strategy(price, volume);
+                UpdateCli(price.ToString() ,volume.ToString(), result);
+
+            }
+            Thread.Sleep(1000);
+
+            // CheckStrategyResult(result);
+        }
+
+        private void UpdateCli(string price,string volume, string result){
+            Console.Clear();
+            Console.WriteLine($"Price: {price} Volume: {volume} Result: {result}");
         }
 
         private void CheckStrategyResult(string result)
