@@ -8,11 +8,11 @@ namespace Application.Indicators
 {
     public class VWAP_live : ITechnicalIndicator
     {
-        public Queue<float> activePrice = new Queue<float>();
+        private Queue<float> activePrice = new Queue<float>();
 
-        public Queue<float> activeVolume = new Queue<float>();
+        private Queue<float> activeVolume = new Queue<float>();
 
-        public Queue<float> VWAPQUEUE = new Queue<float>();
+        private Queue<float> VWAPQUEUE = new Queue<float>();
 
         private float priceToday;
 
@@ -24,7 +24,7 @@ namespace Application.Indicators
 
         private float VWAP_NORNAL;
 
-        public int VwapPeriod { get; set; }
+        private int VwapPeriod { get; set; }
 
         public VWAP_live(int vwapPeriod)
         {
@@ -49,7 +49,7 @@ namespace Application.Indicators
             return (CheckToday(NormalizedPriceToday()));
         }
 
-        public void Calc()
+        private void Calc()
         {
             float sum = 0;
             float sumVolume = 0;
@@ -64,7 +64,7 @@ namespace Application.Indicators
             Console.WriteLine("Today " + VWAP_TODAY);
         }
 
-        public void GetStandardDerivation()
+        private void GetStandardDerivation()
         {
             //get standard derivation of VWAP
             float sum = 0;
@@ -81,7 +81,7 @@ namespace Application.Indicators
             Console.WriteLine("Standard derivation " + VWAP_STANDART_TODAY);
         }
 
-        public float NormalizedPriceToday()
+        private float NormalizedPriceToday()
         {
             float standardMax = VWAP_TODAY + (2 * VWAP_STANDART_TODAY);
             float standardMin = VWAP_TODAY - (2 * VWAP_STANDART_TODAY);
@@ -90,7 +90,7 @@ namespace Application.Indicators
             return VWAP_NORNAL;
         }
 
-        public (float, bool) CheckToday(float NormalizedPrice)
+        private (float, bool) CheckToday(float NormalizedPrice)
         {
             if (NormalizedPrice <= 100 && NormalizedPrice >= 0)
                 return (NormalizedPrice, true);
