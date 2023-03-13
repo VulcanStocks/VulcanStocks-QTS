@@ -2,11 +2,11 @@
 using Application.Indicators;
 using Application.Services;
 
-var ema = new Ema(2);
+var macd = new MacD(7, 26, 4);
 
 var trader = new TradeEngineService(strategy);
 string strategy(float price, float volume){
-    ema.TryGetValue(price,volume);
+    System.Console.WriteLine(macd.TryGetValue(price,volume)); 
     return "hold";
 }
 

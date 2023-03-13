@@ -86,7 +86,6 @@ namespace Application.Services
         }
 
         private void UpdateCli(string price,string volume, string result){
-            Console.Clear();
             Console.WriteLine($"Price: {price} Volume: {volume} Result: {result}");
         }
 
