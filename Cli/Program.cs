@@ -5,9 +5,9 @@ using Application.Services;
 var client = new RealTimeDataService();
 
 
-var trader = new TraderService(strategy);
+var trader = new TradeEngineService(strategy);
 
-string strategy(float price){
+string strategy(float price, float volume){
     IndicatorService.TryCalculateRsi(price);
     return "hold";
 }
