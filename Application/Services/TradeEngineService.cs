@@ -63,8 +63,6 @@ namespace Application.Services
             _cts.Cancel();
             _realTimeDataService.Stop();
             IsAlive = false;
-
-
         }
 
         private void EnterTradeLoop(object obj)
@@ -123,6 +121,8 @@ namespace Application.Services
             {
 
             }
+            System.Console.WriteLine("--------------------------");
+
         }
 
         private void CheckStrategyResult(StrategyResult result, float price)

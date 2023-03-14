@@ -26,6 +26,9 @@ namespace Application.Indicators
 
         public (float, bool) TryGetValue(float price, float volume)
         {
+            if(_lastPrice == price){
+                return (0f, false);
+            }
             // RSI requires at least two data points
             if (_lastPrice == 0f)
             {
@@ -65,6 +68,8 @@ namespace Application.Indicators
             float rsi = 100f - (100f / (1f + rs));
 
             _lastPrice = price;
+
+
             return (rsi, true);
         }
     }

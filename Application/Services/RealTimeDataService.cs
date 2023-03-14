@@ -85,6 +85,10 @@ namespace Application.Services
                     _currentVolume = stock.data[0].v;
                 });
 
+            client.DisconnectionHappened.Subscribe(info => {
+                System.Console.WriteLine($"DisconnectionHappened, type: {info.Type}");
+            });
+
             client.Start();
 
             string message = "{\"type\":\"subscribe\",\"symbol\":\"" + _ticker + "\"}";
