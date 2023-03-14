@@ -5,7 +5,7 @@ using static Application.Services.TradeEngineService;
 
 var macd = new MacD(7, 26, 4);
 
-var trader = new TradeEngineService(strategy);
+var trader = new TradeEngineService(strategy, "BINANCE:BTCUSDT","cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg");
 
 StrategyResult strategy(float price, float volume){
     macd.TryGetValue(price,volume);

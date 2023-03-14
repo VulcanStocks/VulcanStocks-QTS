@@ -17,9 +17,13 @@ namespace Application.Services
 
         public enum StrategyResult { Buy, Sell, Hold }
 
+        private readonly string _ticker;
+        private readonly string _apiToken;
 
-        public TradeEngineService(Func<float, float, StrategyResult> strategy)
+        public TradeEngineService(Func<float, float, StrategyResult> strategy, string ticker, string apiToken)
         {
+            _apiToken = apiToken;
+            _ticker = ticker;
             _strategy = strategy;
             Initialize();
         }
@@ -27,7 +31,7 @@ namespace Application.Services
         public void Initialize()
         {
             _traderThread = new Thread(EnterTradeLoop);
-            _realTimeDataService = new RealTimeDataService();
+            _realTimeDataService = new RealTimeDataService(_ticker, _apiToken);
             _cts = new CancellationTokenSource();
         }
 

@@ -7,9 +7,8 @@ namespace Application.Services
 {
     public class RealTimeDataService
     {
-        private WebsocketClient
-            client =
-                new WebsocketClient(new Uri("wss://ws.finnhub.io?token=cbpq442ad3ieg7faui80"));
+        private WebsocketClient client;
+
 
         private ManualResetEvent exitEvent;
 
@@ -20,9 +19,12 @@ namespace Application.Services
         private float _currentPrice;
         private float _currentVolume;
 
+        private readonly string _ticker;
 
-        public RealTimeDataService()
+        public RealTimeDataService(string ticker, string apiToken)
         {
+            client = new WebsocketClient(new Uri("wss://ws.finnhub.io?token=" + apiToken));
+            _ticker = ticker;
             Initialize();
         }
 
@@ -86,10 +88,11 @@ namespace Application.Services
 
             client.Start();
 
+            string message = "{\"type\":\"subscribe\",\"symbol\":\"" + _ticker + "\"}";
             Task
                 .Run(() =>
                     client
-                        .Send("{\"type\":\"subscribe\",\"symbol\":\"BINANCE:BTCUSDT\"}"));
+                        .Send(message));
 
             exitEvent.WaitOne();
         }
