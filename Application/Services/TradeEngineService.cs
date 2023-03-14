@@ -9,13 +9,16 @@ namespace Application.Services
     {
         private Thread _traderThread;
 
-        private Func<float, float, string> _strategy;
+        private Func<float, float, StrategyResult> _strategy;
 
         private CancellationTokenSource _cts;
 
         RealTimeDataService _realTimeDataService;
 
-        public TradeEngineService(Func<float, float, string> strategy)
+        public enum StrategyResult { Buy, Sell, Hold }
+
+
+        public TradeEngineService(Func<float, float, StrategyResult> strategy)
         {
             _strategy = strategy;
             Initialize();
@@ -77,29 +80,28 @@ namespace Application.Services
             if (price != 0)
             {
                 var result = _strategy(price, volume);
+                CheckStrategyResult(result);
                 UpdateCli(price.ToString() ,volume.ToString(), result);
-
             }
             Thread.Sleep(1000);
 
-            // CheckStrategyResult(result);
         }
 
-        private void UpdateCli(string price,string volume, string result){
+        private void UpdateCli(string price,string volume, StrategyResult result){
             Console.WriteLine($"Price: {price} Volume: {volume} Result: {result}");
         }
 
-        private void CheckStrategyResult(string result)
+        private void CheckStrategyResult(StrategyResult result)
         {
-            if (result == "buy")
+            if (result == StrategyResult.Buy)
             {
                 Console.WriteLine("buy");
             }
-            else if (result == "sell")
+            else if (result == StrategyResult.Sell)
             {
                 Console.WriteLine("sell");
             }
-            else if (result == "hold")
+            else if (result == StrategyResult.Hold)
             {
                 Console.WriteLine("hold");
             }
