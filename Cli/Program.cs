@@ -5,8 +5,9 @@ using Application.Services;
 var macd = new MacD(7, 26, 4);
 
 var trader = new TradeEngineService(strategy);
+
 string strategy(float price, float volume){
-    System.Console.WriteLine(macd.TryGetValue(price,volume)); 
+    macd.TryGetValue(price,volume);
     return "hold";
 }
 

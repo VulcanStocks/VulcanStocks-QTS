@@ -1,7 +1,5 @@
 using System.Net.WebSockets;
 using Websocket.Client;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Domain;
 
