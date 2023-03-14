@@ -9,7 +9,6 @@ namespace Application.Services
     {
         private WebsocketClient client;
 
-
         private ManualResetEvent exitEvent;
 
         private Thread _socketThread;

@@ -15,13 +15,13 @@ namespace Application.Services
         private CancellationTokenSource _cts;
 
         RealTimeDataService _realTimeDataService;
-        SimulatedBrokerService _simulatedBrokerService;
 
         public enum StrategyResult { Buy, Sell, Hold }
         private readonly string _ticker;
         private readonly string _apiToken;
         private readonly float _timeFrame;
         private readonly bool _useSimulatedTrading;
+        public bool IsAlive { get; set; }
 
         public TradeEngineService(Func<float, float, StrategyResult> strategy, string ticker, string apiToken, float timeFrame, bool useSimulatedTrading)
         {
@@ -38,10 +38,6 @@ namespace Application.Services
             _traderThread = new Thread(EnterTradeLoop);
             _realTimeDataService = new RealTimeDataService(_ticker, _apiToken);
             _cts = new CancellationTokenSource();
-            if (_useSimulatedTrading)
-            {
-                _simulatedBrokerService = new SimulatedBrokerService();
-            }
         }
 
         public void StartTrader()
@@ -54,6 +50,7 @@ namespace Application.Services
                 }
                 _realTimeDataService.Start();
                 _traderThread.Start(_cts.Token);
+                IsAlive = true;
             }
             else
             {
@@ -65,6 +62,7 @@ namespace Application.Services
         {
             _cts.Cancel();
             _realTimeDataService.Stop();
+            IsAlive = false;
 
 
         }
@@ -88,7 +86,7 @@ namespace Application.Services
             {
                 if (_useSimulatedTrading)
                 {
-                    _simulatedBrokerService.Sell(price);
+                    SimulatedBrokerService.Sell(price);
                     UpdateCli(price.ToString(), volume.ToString(), StrategyResult.Sell);
                 }
                 else
@@ -119,7 +117,7 @@ namespace Application.Services
 
             if (_useSimulatedTrading)
             {
-                System.Console.WriteLine($"Balance: {_simulatedBrokerService.Balance}");
+                System.Console.WriteLine($"Balance: {SimulatedBrokerService.Balance}");
             }
             else
             {
@@ -151,7 +149,7 @@ namespace Application.Services
         {
             if (_useSimulatedTrading)
             {
-                _simulatedBrokerService.Buy(price);
+                SimulatedBrokerService.Buy(price);
             }
             else
             {
@@ -163,7 +161,7 @@ namespace Application.Services
         {
             if (_useSimulatedTrading)
             {
-                _simulatedBrokerService.Sell(price);
+                SimulatedBrokerService.Sell(price);
             }
             else
             {

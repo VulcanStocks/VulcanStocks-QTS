@@ -5,27 +5,25 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class SimulatedBrokerService
+    public static class SimulatedBrokerService
     {
-        public float Balance { get; set; }
-        public bool HasAsset { get; set; }
+        public static float Balance { get; set; }
+        public static bool HasAsset { get; set; }
 
-        public SimulatedBrokerService()
-        {   
-            Balance = 1000000;
-        }
-        public void Buy(float price)
+        public static void InitSimulatedBroker(float balance)
         {
-
+            Balance = balance;
+        }
+        public static void Buy(float price)
+        {
             if (!HasAsset)
             {
                 Balance -= price;
                 HasAsset = true;
             }
-
         }
 
-        public void Sell(float price)
+        public static void Sell(float price)
         {
             if (HasAsset)
             {
