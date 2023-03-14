@@ -1,24 +1,17 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Application.Indicators;
 using Application.Services;
 using static Application.Services.TradeEngineService;
 
-var macd = new MacD(7, 26, 4);
 
-var trader = new TradeEngineService(strategy, "BINANCE:BTCUSDT","cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg");
+var trader = new TradeEngineService(strategy, "BINANCE:BTCUSDT","cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
+
+
+int i = 10;
+
+int count = 0;
 
 StrategyResult strategy(float price, float volume){
-    macd.TryGetValue(price,volume);
     return StrategyResult.Sell;
 }
 
-      
-
-while (true){
-    
-    if(Console.ReadKey().KeyChar == 's'){
-        trader.StartTrader();
-    }else{
-        trader.StopTrader();
-    }
-}
+trader.StartTrader();
