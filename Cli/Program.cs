@@ -4,10 +4,11 @@ using Application.Services;
 using static Application.Services.TradeEngineService;
 
 SimulatedBrokerService.InitSimulatedBroker(1000);
-
-var trader = new TradeEngineService(strategy, "AAPL", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
 var shortSma = new Sma(50);
 var longSma = new Sma(200);
+
+var trader = new TradeEngineService(strategy, "AAPL", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
+
 
 StrategyResult strategy(float price, float volume)
 {
