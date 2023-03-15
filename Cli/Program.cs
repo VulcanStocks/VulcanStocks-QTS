@@ -1,36 +1,47 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 using Application.Indicators;
 using Application.Services;
+using Cli.Strategies;
 using static Application.Services.TradeEngineService;
 
 SimulatedBrokerService.InitSimulatedBroker(1000);
-var shortSma = new Sma(50);
-var longSma = new Sma(200);
+var hiddenBullishDivergenceStrategy = new HiddenBullishDivergenceStrategy(14);
 
+float orderPrice = 0;
 var trader = new TradeEngineService(strategy, "AAPL", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
 
 
 StrategyResult strategy(float price, float volume)
 {
-    var shortSmaValue = shortSma.TryGetValue(price, volume);
-    var longSmaValue = longSma.TryGetValue(price, volume);
-
-    System.Console.WriteLine($"Short SMA: {shortSmaValue.Item1}, Long SMA: {longSmaValue.Item1}");
-
-    if (shortSmaValue.Item2 && longSmaValue.Item2)
+    if (hiddenBullishDivergenceStrategy.CheckHiddenBullishDivergence(price))
     {
-        if (shortSmaValue.Item1 > longSmaValue.Item1)
+        Console.WriteLine($"Hidden Bullish Divergence upptäckt vid pris: {price}");
+        if (!SimulatedBrokerService.HasAsset)
         {
+            orderPrice = price;
             return StrategyResult.Buy;
         }
-        else if (shortSmaValue.Item1 < longSmaValue.Item1)
+        else
         {
+            return StrategyResult.Hold;
+        }
+
+    }
+    else if (price > orderPrice * (1 + (0.05 / 100)) || price < orderPrice * (0.025 + (1 / 100)) && orderPrice != 0)
+    {
+        if (SimulatedBrokerService.HasAsset)
+        {
+            orderPrice = 0;
             return StrategyResult.Sell;
         }
+        else
+        {
+            return StrategyResult.Hold;
+        }
     }
-
-    return StrategyResult.Hold;
+    else return StrategyResult.Hold;
 }
+
 while (true)
 {
     if (Console.ReadKey().KeyChar == ' ')

@@ -1,7 +1,10 @@
+using System;
 using System.Net.WebSockets;
-using Websocket.Client;
-using Newtonsoft.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Domain;
+using Newtonsoft.Json;
+using Websocket.Client;
 
 namespace Application.Services
 {
@@ -13,7 +16,8 @@ namespace Application.Services
 
         private Thread _socketThread;
 
-        private bool _isDisconected = false;
+        private bool _isDisconnected = false;
+        private bool _reconnecting = false;
 
         private float _currentPrice;
         private float _currentVolume;
@@ -46,10 +50,10 @@ namespace Application.Services
         {
             if (!_socketThread.IsAlive)
             {
-                if (_isDisconected)
+                if (_isDisconnected)
                 {
                     Initialize();
-                    _isDisconected = false;
+                    _isDisconnected = false;
                 }
                 _socketThread.Start();
             }
@@ -62,7 +66,7 @@ namespace Application.Services
         public void Stop()
         {
             Disconnect();
-            _isDisconected = true;
+            _isDisconnected = true;
         }
 
         private void Connect()
@@ -73,31 +77,50 @@ namespace Application.Services
             client
                 .ReconnectionHappened
                 .Subscribe(info =>
-                    Console
-                        .WriteLine($"Reconnection happened, type: {info.Type}"));
+                {
+                    Console.WriteLine($"Reconnection happened, type: {info.Type}");
+                    if (!_reconnecting)
+                    {
+                        _reconnecting = true;
+                        SubscribeToTicker();
+                    }
+                });
 
             client
                 .MessageReceived
-                .Subscribe(msg =>
-                {
-                    StockResponse stock = JsonConvert.DeserializeObject<StockResponse>(msg.ToString());
-                    _currentPrice = stock.data[0].p;
-                    _currentVolume = stock.data[0].v;
-                });
+                .Subscribe(HandleMessageReceived);
 
-            client.DisconnectionHappened.Subscribe(info => {
+            client.DisconnectionHappened.Subscribe(info =>
+            {
                 System.Console.WriteLine($"DisconnectionHappened, type: {info.Type}");
+                if (info.Type == DisconnectionType.ByUser)
+                {
+                    _reconnecting = false;
+                }
             });
 
             client.Start();
 
-            string message = "{\"type\":\"subscribe\",\"symbol\":\"" + _ticker + "\"}";
-            Task
-                .Run(() =>
-                    client
-                        .Send(message));
+            SubscribeToTicker();
 
             exitEvent.WaitOne();
+        }
+
+        private void SubscribeToTicker()
+        {
+            string message = "{\"type\":\"subscribe\",\"symbol\":\"" + _ticker + "\"}";
+            Task.Run(() => client.Send(message));
+        }
+
+
+        private void HandleMessageReceived(ResponseMessage msg)
+        {
+            if (msg.MessageType == WebSocketMessageType.Text && msg.Text.Contains("\"data\":"))
+            {
+                StockResponse stock = JsonConvert.DeserializeObject<StockResponse>(msg.Text);
+                _currentPrice = stock.data[0].p;
+                _currentVolume = stock.data[0].v;
+            }
         }
 
         private void Disconnect()
@@ -110,7 +133,4 @@ namespace Application.Services
             }
         }
     }
-
-
-
 }
