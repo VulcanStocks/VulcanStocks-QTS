@@ -4,37 +4,42 @@ using Application.Services;
 using static Application.Services.TradeEngineService;
 
 SimulatedBrokerService.InitSimulatedBroker(1000);
-var rsi = new Rsi(14);
-var obv = new Obv();
-var trader = new TradeEngineService(strategy, "AAPL", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
 
-StrategyResult strategy(float price, float volume) 
+var trader = new TradeEngineService(strategy, "AAPL", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
+var shortSma = new Sma(50);
+var longSma = new Sma(200);
+
+StrategyResult strategy(float price, float volume)
 {
-    var rsiValue = rsi.TryGetValue(price, volume);
-    var obvValue = obv.TryGetValue(price, volume);
-    
-    System.Console.WriteLine($"RSI: {rsiValue}, OBV: {obvValue}");
-    
-    if (rsiValue.Item2 && obvValue.Item2) 
+    var shortSmaValue = shortSma.TryGetValue(price, volume);
+    var longSmaValue = longSma.TryGetValue(price, volume);
+
+    System.Console.WriteLine($"Short SMA: {shortSmaValue.Item1}, Long SMA: {longSmaValue.Item1}");
+
+    if (shortSmaValue.Item2 && longSmaValue.Item2)
     {
-        if (rsiValue.Item1 < 30 && obvValue.Item1 > obv.GetResistanceLevel()) 
+        if (shortSmaValue.Item1 > longSmaValue.Item1)
         {
             return StrategyResult.Buy;
-        } 
-        else if (rsiValue.Item1 > 70 && obvValue.Item1 < obv.GetResistanceLevel()) 
+        }
+        else if (shortSmaValue.Item1 < longSmaValue.Item1)
         {
             return StrategyResult.Sell;
         }
     }
-    
+
     return StrategyResult.Hold;
 }
-while(true){
-    if(Console.ReadKey().KeyChar == ' '){
-        if(trader.IsAlive){
+while (true)
+{
+    if (Console.ReadKey().KeyChar == ' ')
+    {
+        if (trader.IsAlive)
+        {
             trader.StopTrader();
         }
-        else{
+        else
+        {
             trader.StartTrader();
         }
     }
