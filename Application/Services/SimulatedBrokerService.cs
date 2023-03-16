@@ -9,16 +9,18 @@ namespace Application.Services
     {
         public static float Balance { get; set; }
         public static bool HasAsset { get; set; }
+        private static float _amountOfAssetsToBuy;
 
-        public static void InitSimulatedBroker(float balance)
+        public static void InitSimulatedBroker(float balance, float amountOfAssetsToBuy)
         {
+            _amountOfAssetsToBuy = amountOfAssetsToBuy;
             Balance = balance;
         }
         public static void Buy(float price)
         {
             if (!HasAsset)
             {
-                Balance -= price;
+                Balance -= price * _amountOfAssetsToBuy;
                 HasAsset = true;
             }
         }
@@ -27,7 +29,7 @@ namespace Application.Services
         {
             if (HasAsset)
             {
-                Balance += price;
+                Balance += price * _amountOfAssetsToBuy;
                 HasAsset = false;
             }
         }
