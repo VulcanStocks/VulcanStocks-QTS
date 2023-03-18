@@ -8,7 +8,7 @@ SimulatedBrokerService.InitSimulatedBroker(100000, 2);
 var hiddenBullishDivergenceStrategy = new HiddenBullishDivergenceStrategy(14, 5, 3);
 //BINANCE:BTCUSDT"
 float orderPrice = 0;
-var trader = new TradeEngineService(strategy, "BINANCE:BTCUSDT", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg", 1f, true);
+var trader = new TradeEngineService(strategy , 1f, new RealTimeDataService("BINANCE:BTCUSDT", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg"), new BrokerService(true));
 
 
 StrategyResult strategy(float price, float volume)

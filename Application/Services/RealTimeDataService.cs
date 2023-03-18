@@ -2,13 +2,14 @@ using System;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.IServices;
 using Domain;
 using Newtonsoft.Json;
 using Websocket.Client;
 
 namespace Application.Services
 {
-    public class RealTimeDataService
+    public class RealTimeDataService : IRealTimeDataService
     {
         private WebsocketClient client;
 
