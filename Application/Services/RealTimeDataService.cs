@@ -6,28 +6,24 @@ using Application.IServices;
 using Domain;
 using Newtonsoft.Json;
 using Websocket.Client;
+using Websocket.Client.Models;
 
 namespace Application.Services
 {
     public class RealTimeDataService : IRealTimeDataService
     {
-        private WebsocketClient client;
-
-        private ManualResetEvent exitEvent;
-
+        private WebsocketClient _client;
+        private ManualResetEvent _exitEvent;
         private Thread _socketThread;
-
-        private bool _isDisconnected = false;
-        private bool _reconnecting = false;
-
+        private bool _isDisconnected;
+        private bool _reconnecting;
         private float _currentPrice;
         private float _currentVolume;
-
         private readonly string _ticker;
 
         public RealTimeDataService(string ticker, string apiToken)
         {
-            client = new WebsocketClient(new Uri("wss://ws.finnhub.io?token=" + apiToken));
+            _client = new WebsocketClient(new Uri("wss://ws.finnhub.io?token=" + apiToken));
             _ticker = ticker;
             Initialize();
         }
@@ -51,16 +47,21 @@ namespace Application.Services
         {
             if (!_socketThread.IsAlive)
             {
-                if (_isDisconnected)
-                {
-                    Initialize();
-                    _isDisconnected = false;
-                }
+                RestartIfDisconnected();
                 _socketThread.Start();
             }
             else
             {
-                System.Console.WriteLine("Trader is already running");
+                Console.WriteLine("Trader is already running");
+            }
+        }
+
+        private void RestartIfDisconnected()
+        {
+            if (_isDisconnected)
+            {
+                Initialize();
+                _isDisconnected = false;
             }
         }
 
@@ -72,53 +73,51 @@ namespace Application.Services
 
         private void Connect()
         {
-            exitEvent = new ManualResetEvent(false);
-
-            client.ReconnectTimeout = TimeSpan.FromSeconds(30);
-            client
-                .ReconnectionHappened
-                .Subscribe(info =>
-                {
-                    Console.WriteLine($"Reconnection happened, type: {info.Type}");
-                    if (!_reconnecting)
-                    {
-                        _reconnecting = true;
-                        SubscribeToTicker();
-                    }
-                });
-
-            client
-                .MessageReceived
-                .Subscribe(HandleMessageReceived);
-
-            client.DisconnectionHappened.Subscribe(info =>
-            {
-                System.Console.WriteLine($"DisconnectionHappened, type: {info.Type}");
-                if (info.Type == DisconnectionType.ByUser)
-                {
-                    _reconnecting = false;
-                }
-            });
-
-            client.Start();
-
+            _exitEvent = new ManualResetEvent(false);
+            ConfigureClient();
+            _client.Start();
             SubscribeToTicker();
+            _exitEvent.WaitOne();
+        }
 
-            exitEvent.WaitOne();
+        private void ConfigureClient()
+        {
+            _client.ReconnectTimeout = TimeSpan.FromSeconds(30);
+            _client.ReconnectionHappened.Subscribe(HandleReconnection);
+            _client.MessageReceived.Subscribe(HandleMessageReceived);
+            _client.DisconnectionHappened.Subscribe(HandleDisconnection);
+        }
+
+        private void HandleReconnection(ReconnectionInfo info)
+        {
+            Console.WriteLine($"Reconnection happened, type: {info.Type}");
+            if (!_reconnecting)
+            {
+                _reconnecting = true;
+                SubscribeToTicker();
+            }
+        }
+
+        private void HandleDisconnection(DisconnectionInfo info)
+        {
+            Console.WriteLine($"Disconnection happened, type: {info.Type}");
+            if (info.Type == DisconnectionType.ByUser)
+            {
+                _reconnecting = false;
+            }
         }
 
         private void SubscribeToTicker()
         {
-            string message = "{\"type\":\"subscribe\",\"symbol\":\"" + _ticker + "\"}";
-            Task.Run(() => client.Send(message));
+            var message = "{\"type\":\"subscribe\",\"symbol\":\"" + _ticker + "\"}";
+            Task.Run(() => _client.Send(message));
         }
-
 
         private void HandleMessageReceived(ResponseMessage msg)
         {
             if (msg.MessageType == WebSocketMessageType.Text && msg.Text.Contains("\"data\":"))
             {
-                StockResponse stock = JsonConvert.DeserializeObject<StockResponse>(msg.Text);
+                var stock = JsonConvert.DeserializeObject<StockResponse>(msg.Text);
                 _currentPrice = stock.data[0].p;
                 _currentVolume = stock.data[0].v;
             }
@@ -126,11 +125,11 @@ namespace Application.Services
 
         private void Disconnect()
         {
-            if (client != null && client.IsRunning)
+            if (_client != null && _client.IsRunning)
             {
-                client.Stop(WebSocketCloseStatus.NormalClosure, "");
-                exitEvent.Set();
-                System.Console.WriteLine("Client disconnect");
+                _client.Stop(WebSocketCloseStatus.NormalClosure, "");
+                _exitEvent.Set();
+                Console.WriteLine("Client disconnected");
             }
         }
     }
