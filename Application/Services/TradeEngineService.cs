@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.IServices;
+using Domain.IServices;
 
 namespace Application.Services
 {

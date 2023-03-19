@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Application.IServices
+namespace Domain.IServices
 {
     public interface ITradeEngineService
     {

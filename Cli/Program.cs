@@ -1,6 +1,5 @@
 // See https://aka.ms/new-console-template for more information
 using Application.Indicators;
-using Application.IServices;
 using Application.Services;
 using Cli.Strategies;
 using static Application.Services.TradeEngineService;
@@ -9,6 +8,7 @@ SimulatedBrokerService.InitSimulatedBroker(100000, 2);
 var hiddenBullishDivergenceStrategy = new HiddenBullishDivergenceStrategy(14, 5, 3);
 //BINANCE:BTCUSDT"
 float orderPrice = 0;
+
 var trader = new TradeEngineService(strategy , 1f, new RealTimeDataService("BINANCE:BTCUSDT", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg"), new BrokerService(true));
 
 

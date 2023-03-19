@@ -8,13 +8,15 @@ namespace Application.Services
 {
     public class BacktesterService
     {
-        TradeEngineService tradeEngineService;
         public BacktesterService(Func<float, float, StrategyResult> strategy, string ticker, float timeFrame)
         {
-            
+
         }
 
 
-        
+
+
+
+
     }
 }
