@@ -125,5 +125,10 @@ namespace Application.Services
             Console.WriteLine($"Balance: {_brokerService.GetBalance()}");
             Console.WriteLine("--------------------------");
         }
+
+        public bool IsTraderRunning()
+        {
+            return IsAlive;
+        }
     }
 }

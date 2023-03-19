@@ -9,5 +9,6 @@ namespace Domain.IServices
     {
         void StartTrader();
         void StopTrader();
+        bool IsTraderRunning();
     }
 }
