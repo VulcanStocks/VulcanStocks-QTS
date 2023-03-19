@@ -71,7 +71,6 @@ namespace Application.Services
                     _brokerService.Sell(price);
                     break;
                 case StrategyResult.Hold:
-                    Console.WriteLine("Hold");
                     break;
                 default:
                     throw new OperationCanceledException();
@@ -85,7 +84,7 @@ namespace Application.Services
             result.Profit = SimulatedBrokerService.Balance - initailBalance;
             result.AmountOfTests = amountOfTests;
             result.TradesTaken = TradesTaken;
-            result.WinLossRatio = SimulatedBrokerService.TotalWins/SimulatedBrokerService.TotalLosses;
+            result.WinLossRatio = (float)SimulatedBrokerService.TotalWins/(float)SimulatedBrokerService.TotalLosses;
 
             return result;
         }

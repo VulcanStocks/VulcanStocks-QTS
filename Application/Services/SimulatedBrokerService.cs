@@ -8,13 +8,21 @@ namespace Application.Services
     public static class SimulatedBrokerService
     {
         public static float Balance { get; set; }
+
         public static bool HasAsset { get; set; }
-        public static float PreviousBalance  { get; set; }
+
+        public static float PreviousBalance { get; set; }
+
         private static float _amountOfAssetsToBuy;
+
         public static int TotalWins { get; set; }
+
         public static int TotalLosses { get; set; }
 
-        public static void InitSimulatedBroker(float balance, float amountOfAssetsToBuy)
+        public static void InitSimulatedBroker(
+            float balance,
+            float amountOfAssetsToBuy
+        )
         {
             _amountOfAssetsToBuy = amountOfAssetsToBuy;
             Balance = balance;
@@ -22,10 +30,12 @@ namespace Application.Services
             TotalWins = 0;
             TotalLosses = 0;
         }
+
         public static void Buy(float price)
         {
-            if (!HasAsset)
+            if (!HasAsset && Balance >= price * _amountOfAssetsToBuy)
             {
+
                 PreviousBalance = Balance;
                 Balance -= price * _amountOfAssetsToBuy;
                 HasAsset = true;
@@ -39,14 +49,15 @@ namespace Application.Services
                 Balance += price * _amountOfAssetsToBuy;
                 HasAsset = false;
 
-                if(Balance > PreviousBalance){
+                if (Balance > PreviousBalance)
+                {
                     TotalWins++;
                 }
-                else{
+                else
+                {
                     TotalLosses++;
                 }
             }
         }
-
     }
 }
