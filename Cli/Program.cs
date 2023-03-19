@@ -2,6 +2,7 @@
 using Application.Indicators;
 using Application.Services;
 using Cli.Strategies;
+using Domain;
 using static Application.Services.TradeEngineService;
 
 SimulatedBrokerService.InitSimulatedBroker(100000, 2);

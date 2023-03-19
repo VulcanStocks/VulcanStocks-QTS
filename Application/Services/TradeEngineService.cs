@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain;
 using Domain.IServices;
 
 namespace Application.Services
@@ -14,7 +15,6 @@ namespace Application.Services
         private IRealTimeDataService _realTimeDataService;
         private IBrokerService _brokerService;
 
-        public enum StrategyResult { Buy, Sell, Hold }
         private readonly float _timeFrame;
         public bool IsAlive { get; set; }
 
