@@ -6,7 +6,7 @@ using Application.IServices;
 namespace Application.Services
 {
 
-    public class TradeEngineService
+    public class TradeEngineService : ITradeEngineService
     {
         private Thread _traderThread;
         private Func<float, float, StrategyResult> _strategy;
@@ -27,7 +27,7 @@ namespace Application.Services
             Initialize();
         }
 
-        public void Initialize()
+        private void Initialize()
         {
             _traderThread = new Thread(EnterTradeLoop);
             _cts = new CancellationTokenSource();

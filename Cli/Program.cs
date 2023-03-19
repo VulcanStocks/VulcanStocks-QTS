@@ -1,5 +1,6 @@
 // See https://aka.ms/new-console-template for more information
 using Application.Indicators;
+using Application.IServices;
 using Application.Services;
 using Cli.Strategies;
 using static Application.Services.TradeEngineService;
