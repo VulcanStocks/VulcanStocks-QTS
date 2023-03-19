@@ -7,7 +7,7 @@ namespace Domain.IServices
 {
     public interface IHistoricalDataService
     {
-        List<HistoricalDataModel> GetDataList(string symbol, string interval, string apikey);   
+        Task<List<HistoricalDataModel>> GetDataListAsync(string symbol, string interval, string apikey);
 
     }
 }
