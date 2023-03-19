@@ -19,12 +19,12 @@ StrategyResult strategy(float price, float volume){
 // För varje pris i din prishistorik, använd strategin för att avgöra om du ska köpa, sälja eller hålla
 
 */
-var advancedVwapStrategy = new AdvancedVwapStrategy(78 ,12, 26, 9, 14);
+var macdRsiStrategy = new MacdRsiStrategy(12, 26, 9, 14);
 var trader = new TradingOrchestrator(strategy, 1f, new RealTimeDataService("BINANCE:BTCUSDT", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg"), new BrokerService(true));
 
 StrategyResult strategy(float price, float volume)
 {
-    return advancedVwapStrategy.Evaluate(price, volume);
+    return macdRsiStrategy.Evaluate(price, volume);
 }
 
 
@@ -50,7 +50,7 @@ while (true)
 */
 
 
-var result = await trader.RunBacktest(100000, 2, "aapl", "5min", "9HU1R3FPJHV0PEKT");
+var result = await trader.RunBacktest(10000, 2, "aapl", "5min", "9HU1R3FPJHV0PEKT");
 
 Console.WriteLine("Statistik för handelsstrategi:");
 Console.WriteLine("--------------------------------");
