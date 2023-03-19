@@ -4,12 +4,9 @@ using Application.Services;
 using Cli.Strategies;
 using Domain;
 
-var hiddenBullishDivergenceStrategy = new HiddenBullishDivergenceStrategy(14, 50, 3);
 //BINANCE:BTCUSDT"
 
-float orderPrice = 0;
 
-var trader = new TradingOrchestrator(strategy, 1f, new RealTimeDataService("BINANCE:BTCUSDT", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg"), new BrokerService(true));
 /*
 
 StrategyResult strategy(float price, float volume){
@@ -22,49 +19,12 @@ StrategyResult strategy(float price, float volume){
 // För varje pris i din prishistorik, använd strategin för att avgöra om du ska köpa, sälja eller hålla
 
 */
+var advancedVwapStrategy = new AdvancedVwapStrategy(78 ,12, 26, 9, 14);
+var trader = new TradingOrchestrator(strategy, 1f, new RealTimeDataService("BINANCE:BTCUSDT", "cg867dpr01qsgaf0mme0cg867dpr01qsgaf0mmeg"), new BrokerService(true));
+
 StrategyResult strategy(float price, float volume)
 {
-    var div = hiddenBullishDivergenceStrategy.CheckHiddenBullishDivergence(price);
-    if (div)
-    {
-        if (!SimulatedBrokerService.HasAsset)
-        {
-            orderPrice = price;
-            return StrategyResult.Buy;
-        }
-        else
-        {
-            return StrategyResult.Hold;
-        }
-
-    }
-    else if (price > orderPrice * (1 + (0.005 / 100))&& orderPrice != 0)
-    {
-        if (SimulatedBrokerService.HasAsset)
-        {
-            orderPrice = 0;
-            return StrategyResult.Sell;
-        }
-        else
-        {
-            return StrategyResult.Hold;
-        }
-    }
-    else if (price < orderPrice * (1 - (0.0025 / 100))){
-
-
-        if (SimulatedBrokerService.HasAsset)
-        {
-            orderPrice = 0;
-            return StrategyResult.Sell;
-        }
-        else
-        {
-            return StrategyResult.Hold;
-        }
-
-    }
-    else return StrategyResult.Hold;
+    return advancedVwapStrategy.Evaluate(price, volume);
 }
 
 
@@ -90,12 +50,12 @@ while (true)
 */
 
 
-var result = await trader.RunBacktest(100000, 2, "ADBE", "1min", "9HU1R3FPJHV0PEKT");
+var result = await trader.RunBacktest(100000, 2, "aapl", "5min", "9HU1R3FPJHV0PEKT");
 
 Console.WriteLine("Statistik för handelsstrategi:");
-    Console.WriteLine("--------------------------------");
-    Console.WriteLine($"Vinst/Förlust-kvot: {result.WinLossRatio}");
-    Console.WriteLine($"Antal genomförda affärer: {result.TradesTaken}");
-    Console.WriteLine($"Antal tester: {result.AmountOfTests}");
-    Console.WriteLine($"Kontosaldo: {result.Balance}");
-    Console.WriteLine($"Total vinst: {result.Profit}");
+Console.WriteLine("--------------------------------");
+Console.WriteLine($"Vinst/Förlust-kvot: {result.WinLossRatio}");
+Console.WriteLine($"Antal genomförda affärer: {result.TradesTaken}");
+Console.WriteLine($"Antal tester: {result.AmountOfTests}");
+Console.WriteLine($"Kontosaldo: {result.Balance}");
+Console.WriteLine($"Total vinst: {result.Profit}");

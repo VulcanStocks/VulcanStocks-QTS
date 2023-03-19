@@ -6,7 +6,7 @@ using Domain;
 
 namespace Application.Indicators
 {
-    public class VWAP_live : ITechnicalIndicator
+    public class NoramlizedVwap : ITechnicalIndicator
     {
         private Queue<float> activePrice = new Queue<float>();
 
@@ -26,7 +26,7 @@ namespace Application.Indicators
 
         private int VwapPeriod { get; set; }
 
-        public VWAP_live(int vwapPeriod)
+        public NoramlizedVwap(int vwapPeriod)
         {
             VwapPeriod = vwapPeriod;
         }
@@ -61,7 +61,6 @@ namespace Application.Indicators
 
             VWAP_TODAY = sum / sumVolume;
             VWAPQUEUE.Enqueue (VWAP_TODAY);
-            Console.WriteLine("Today " + VWAP_TODAY);
         }
 
         private void GetStandardDerivation()
@@ -78,7 +77,6 @@ namespace Application.Indicators
                 sumVolume += activeVolume.ElementAt(i);
             }
             VWAP_STANDART_TODAY = (float) Math.Sqrt(sum / sumVolume);
-            Console.WriteLine("Standard derivation " + VWAP_STANDART_TODAY);
         }
 
         private float NormalizedPriceToday()
