@@ -28,7 +28,7 @@ StrategyResult strategy(float price, float volume)
         }
 
     }
-    else if (price > orderPrice * (1 + (0.5 / 100)) || price < orderPrice * (0.25 + (1 / 100)) && orderPrice != 0)
+    else if (price > orderPrice * (1 + (0.05 / 100)) || price < orderPrice * (0.025 + (1 / 100)) && orderPrice != 0)
     {
         if (SimulatedBrokerService.HasAsset)
         {
@@ -43,6 +43,15 @@ StrategyResult strategy(float price, float volume)
     else return StrategyResult.Hold;
 }
 
+
+var result = await trader.RunBacktest(100000, 2, "AAPL", "5min", "9HU1R3FPJHV0PEKT");
+
+System.Console.WriteLine(result);
+
+
+
+
+/*
 System.Console.WriteLine("Press space to start:");
 while (true)
 {
@@ -58,3 +67,5 @@ while (true)
         }
     }
 }
+
+*/

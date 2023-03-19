@@ -1,12 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Domain;
 using Domain.IServices;
-using Newtonsoft.Json;
+using Domain.Models;
 
 namespace Application.Services
 {
@@ -19,48 +21,56 @@ namespace Application.Services
             _httpClient = new HttpClient();
         }
 
-        public async Task<List<HistoricalDataModel>> GetDataListAsync(string symbol, string interval, string apikey)
+        public async Task<List<HistoricalDataModel>>
+        GetDataListAsync(string symbol, string interval, string apikey)
         {
             string queryUrl = BuildQueryUrl(symbol, interval, apikey);
-            var jsonData = await FetchJsonDataAsync(queryUrl);
-
-            return ExtractHistoricalData(jsonData);
+            string csvData = await FetchCsvDataAsync(queryUrl);
+            return ParseCsvData(csvData);
         }
 
-        private string BuildQueryUrl(string symbol, string interval, string apikey)
+        private string
+        BuildQueryUrl(string symbol, string interval, string apikey)
         {
-            return $"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval={interval}&apikey={apikey}";
+            return $"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY_EXTENDED&symbol={
+                symbol}&interval={interval}&apikey={apikey}";
         }
 
-        private async Task<dynamic> FetchJsonDataAsync(string queryUrl)
+        private async Task<string> FetchCsvDataAsync(string queryUrl)
         {
             var response = await _httpClient.GetAsync(queryUrl);
             response.EnsureSuccessStatusCode();
 
-            string content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(content);
+            return await response.Content.ReadAsStringAsync();
         }
 
-        private List<HistoricalDataModel> ExtractHistoricalData(dynamic jsonData)
+        private List<HistoricalDataModel> ParseCsvData(string csvData)
         {
-            var timeSeries = jsonData["Time Series (5min)"];
-            List<HistoricalDataModel> historicalDataList = new List<HistoricalDataModel>();
-
-            foreach (var timestamp in timeSeries)
+            using (var reader = new StringReader(csvData))
+            using (
+                var csv =
+                    new CsvReader(reader,
+                        new CsvConfiguration(CultureInfo.InvariantCulture)
+                        {
+                            HasHeaderRecord = true,
+                            IgnoreBlankLines = true,
+                            BadDataFound = null
+                        })
+            )
             {
-                float closePrice = float.Parse(timestamp.Value["4. close"].Value, CultureInfo.InvariantCulture);
-                float volume = float.Parse(timestamp.Value["5. volume"].Value, CultureInfo.InvariantCulture);
+                csv.Context.RegisterClassMap<HistoricalDataModelClassMap>();
 
-                HistoricalDataModel historicalData = new HistoricalDataModel
-                {
-                    Price = closePrice,
-                    Volume = volume
-                };
-
-                historicalDataList.Add(historicalData);
+                return csv.GetRecords<HistoricalDataModel>().ToList();
             }
+        }
+    }
 
-            return historicalDataList;
+    public class HistoricalDataModelClassMap : ClassMap<HistoricalDataModel>
+    {
+        public HistoricalDataModelClassMap()
+        {
+            Map(m => m.Price).Name("close");
+            Map(m => m.Volume).Name("volume");
         }
     }
 }

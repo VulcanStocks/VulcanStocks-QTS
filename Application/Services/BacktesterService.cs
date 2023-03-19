@@ -45,6 +45,7 @@ namespace Application.Services
         {
             SimulatedBrokerService.InitSimulatedBroker(balance, amountOfAssetsToBuy);
             _data = await _historicalDataService.GetDataListAsync(symbol, interval, apikey);
+            System.Console.WriteLine(_data);
         }
 
 
