@@ -1,6 +1,6 @@
 # VulcanStocks-QTS
 
-VulcanStocks-QTS is a quant trading system (QTS) that provides a robust and versatile infrastructure for algorithmic trading of virtual assets. It allows for the development, backtesting, and execution of trading strategies using a simulated brokerage service.
+VulcanStocks-QTS is a quantitative trading system (QTS) that provides a robust and versatile infrastructure for algorithmic trading of virtual assets. It allows for the development, backtesting, and execution of trading strategies using a simulated brokerage service.
 
 > **Note**: VulcanStocks-QTS currently does not support real money trading.
 
