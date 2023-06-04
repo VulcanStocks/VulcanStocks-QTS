@@ -25,15 +25,6 @@ The `TradingOrchestrator` class is the primary entry point to the system. It ini
 - **SimulatedBrokerHasAsset**: This method checks if the simulated broker currently holds any assets.
 - **IsTraderRunning**: This method checks if the trading engine is currently running.
 
-### Services
-
-The `TradingOrchestrator` depends on the following services, which are all included in the repository:
-
-- `ITradeEngineService`
-- `IBacktesterService`
-- `IRealTimeDataService`
-- `IBrokerService`
-
 ## How to Use
 
 To start using VulcanStocks-QTS, initialize the `TradingOrchestrator` with your chosen trading strategy function, the time frame for trading, and the relevant data and broker services. Then you can start the trading process, stop it as needed, or run backtests.
